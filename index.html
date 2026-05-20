@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ETHICS AI CHALLENGE</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(135deg,#020024,#090979,#000000);
+    color:white;
+    overflow:hidden;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+body::before{
+    content:'';
+    position:absolute;
+    width:200%;
+    height:200%;
+    background:
+    radial-gradient(circle,#00f2ff22 1px,transparent 1px);
+    background-size:40px 40px;
+    animation:moveBg 15s linear infinite;
+}
+
+@keyframes moveBg{
+    from{
+        transform:translate(0,0);
+    }
+    to{
+        transform:translate(-200px,-200px);
+    }
+}
+
+.container{
+    position:relative;
+    width:95%;
+    max-width:900px;
+    background:rgba(0,0,0,0.65);
+    backdrop-filter:blur(12px);
+    border:2px solid #00f2ff44;
+    border-radius:30px;
+    padding:40px;
+    box-shadow:0 0 40px #00f2ff44;
+    z-index:2;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.logo h1{
+    font-family:'Orbitron',sans-serif;
+    font-size:3rem;
+    color:#00f2ff;
+    text-shadow:0 0 20px #00f2ff;
+}
+
+.logo p{
+    margin-top:10px;
+    color:#ccc;
+}
+
+.start-screen,
+.quiz-screen,
+.result-screen{
+    display:none;
+}
+
+.active{
+    display:block;
+}
+
+.start-btn,
+.answer-btn,
+.restart-btn{
+    width:100%;
+    padding:18px;
+    margin-top:20px;
+    border:none;
+    border-radius:15px;
+    font-size:1rem;
+    cursor:pointer;
+    transition:0.3s;
+    font-weight:bold;
+}
+
+.start-btn{
+    background:#00f2ff;
+    color:black;
+    font-size:1.2rem;
+}
+
+.start-btn:hover{
+    transform:scale(1.03);
+    box-shadow:0 0 20px #00f2ff;
+}
+
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.top-box{
+    background:#111;
+    padding:10px 20px;
+    border-radius:15px;
+    border:1px solid #00f2ff55;
+}
+
+.question{
+    font-size:1.5rem;
+    margin-bottom:30px;
+    line-height:1.6;
+}
+
+.answer-btn{
+    background:#121212;
+    color:white;
+    border:2px solid #00f2ff44;
+}
+
+.answer-btn:hover{
+    background:#00f2ff;
+    color:black;
+    transform:translateY(-3px);
+    box-shadow:0 0 15px #00f2ff;
+}
+
+.correct{
+    background:#00ff99 !important;
+    color:black !important;
+}
+
+.wrong{
+    background:#ff004c !important;
+}
+
+.explanation{
+    margin-top:25px;
+    background:#0d0d0d;
+    border-left:5px solid #00f2ff;
+    padding:20px;
+    border-radius:10px;
+    display:none;
+    animation:fade 0.5s ease;
+}
+
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.result-screen{
+    text-align:center;
+}
+
+.result-screen h2{
+    font-size:3rem;
+    color:#00f2ff;
+    margin-bottom:20px;
+}
+
+.result-screen p{
+    font-size:1.2rem;
+    margin:15px 0;
+}
+
+.restart-btn{
+    background:#00f2ff;
+    color:black;
+}
+
+.progress{
+    width:100%;
+    height:12px;
+    background:#111;
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:30px;
+}
+
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:#00f2ff;
+    transition:0.5s;
+}
+
+@media(max-width:768px){
+
+    .logo h1{
+        font-size:2rem;
+    }
+
+    .question{
+        font-size:1.2rem;
+    }
+
+    .container{
+        padding:25px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="start-screen active">
+
+<div class="logo">
+<h1>🤖 ETHICS AI CHALLENGE</h1>
+<p>Juego Virtual sobre Ética e Inteligencia Artificial</p>
+</div>
+
+<button class="start-btn" onclick="startGame()">🚀 INICIAR JUEGO</button>
+
+</div>
+
+<div class="quiz-screen">
+
+<div class="top-bar">
+
+<div class="top-box">
+🏆 Puntos: <span id="score">0</span>
+</div>
+
+<div class="top-box">
+❤️ Vidas: <span id="lives">3</span>
+</div>
+
+<div class="top-box">
+📚 Pregunta: <span id="question-number">1</span>
+</div>
+
+</div>
+
+<div class="progress">
+<div class="progress-bar" id="progress-bar"></div>
+</div>
+
+<div class="question" id="question"></div>
+
+<div id="answers"></div>
+
+<div class="explanation" id="explanation"></div>
+
+</div>
+
+<div class="result-screen">
+
+<h2>🎉 Juego Finalizado</h2>
+
+<p id="final-score"></p>
+
+<p id="final-level"></p>
+
+<button class="restart-btn" onclick="restartGame()">🔄 JUGAR DE NUEVO</button>
+
+</div>
+
+</div>
+
+<script>
+
+const questions = [
+
+{
+question:"Una empresa usa IA para seleccionar empleados y rechaza automáticamente mujeres.",
+answers:["Ético","No ético","Depende"],
+correct:1,
+explanation:"La IA puede discriminar si fue entrenada con datos sesgados."
+},
+
+{
+question:"Un hospital usa inteligencia artificial para detectar cáncer de manera temprana.",
+answers:["Ético","No ético","Depende"],
+correct:0,
+explanation:"La IA puede mejorar diagnósticos médicos y salvar vidas."
+},
+
+{
+question:"Una red social vende datos personales sin permiso.",
+answers:["Ético","No ético","Depende"],
+correct:1,
+explanation:"Viola la privacidad y el consentimiento de los usuarios."
+},
+
+{
+question:"Una IA ayuda a personas ciegas describiendo objetos mediante cámara.",
+answers:["Ético","No ético","Depende"],
+correct:0,
+explanation:"La IA puede mejorar la accesibilidad y la inclusión."
+},
+
+{
+question:"Un sistema de reconocimiento facial falla más con personas negras.",
+answers:["Ético","No ético","Depende"],
+correct:1,
+explanation:"Esto demuestra sesgos algorítmicos y discriminación."
+},
+
+{
+question:"Una IA genera noticias falsas para manipular elecciones.",
+answers:["Ético","No ético","Depende"],
+correct:1,
+explanation:"Manipular información afecta la democracia."
+},
+
+{
+question:"Una empresa usa IA para recomendar música según gustos del usuario.",
+answers:["Ético","No ético","Depende"],
+correct:2,
+explanation:"Puede ser útil, pero depende del manejo de datos personales."
+},
+
+{
+question:"Un colegio usa IA para vigilar constantemente a estudiantes.",
+answers:["Ético","No ético","Depende"],
+correct:2,
+explanation:"Puede mejorar seguridad, pero también afectar privacidad."
+},
+
+{
+question:"Una IA detecta fraudes bancarios automáticamente.",
+answers:["Ético","No ético","Depende"],
+correct:0,
+explanation:"Ayuda a proteger a los usuarios y evitar delitos."
+},
+
+{
+question:"Una empresa crea deepfakes sin consentimiento.",
+answers:["Ético","No ético","Depende"],
+correct:1,
+explanation:"Puede afectar identidad, reputación y desinformación."
+}
+
+];
+
+let currentQuestion = 0;
+let score = 0;
+let lives = 3;
+
+const startScreen = document.querySelector(".start-screen");
+const quizScreen = document.querySelector(".quiz-screen");
+const resultScreen = document.querySelector(".result-screen");
+
+const questionText = document.getElementById("question");
+const answersDiv = document.getElementById("answers");
+const explanationDiv = document.getElementById("explanation");
+
+function startGame(){
+
+startScreen.classList.remove("active");
+quizScreen.classList.add("active");
+
+showQuestion();
+
+}
+
+function showQuestion(){
+
+const q = questions[currentQuestion];
+
+document.getElementById("question-number").innerText = currentQuestion + 1;
+
+questionText.innerText = q.question;
+
+answersDiv.innerHTML = "";
+
+explanationDiv.style.display = "none";
+
+q.answers.forEach((answer,index)=>{
+
+const btn = document.createElement("button");
+
+btn.classList.add("answer-btn");
+
+btn.innerText = answer;
+
+btn.onclick = ()=>selectAnswer(index,btn);
+
+answersDiv.appendChild(btn);
+
+});
+
+updateProgress();
+
+}
+
+function selectAnswer(index,btn){
+
+const q = questions[currentQuestion];
+
+const buttons = document.querySelectorAll(".answer-btn");
+
+buttons.forEach(button=>button.disabled = true);
+
+if(index === q.correct){
+
+btn.classList.add("correct");
+
+score += 10;
+
+document.getElementById("score").innerText = score;
+
+}else{
+
+btn.classList.add("wrong");
+
+buttons[q.correct].classList.add("correct");
+
+lives--;
+
+document.getElementById("lives").innerText = lives;
+
+}
+
+explanationDiv.style.display = "block";
+
+explanationDiv.innerHTML = `
+<h3>🧠 Explicación</h3>
+<p>${q.explanation}</p>
+`;
+
+setTimeout(()=>{
+
+currentQuestion++;
+
+if(currentQuestion >= questions.length || lives <= 0){
+
+endGame();
+
+}else{
+
+showQuestion();
+
+}
+
+},2500);
+
+}
+
+function updateProgress(){
+
+const progress = ((currentQuestion)/questions.length)*100;
+
+document.getElementById("progress-bar").style.width = progress + "%";
+
+}
+
+function endGame(){
+
+quizScreen.classList.remove("active");
+resultScreen.classList.add("active");
+
+document.getElementById("final-score").innerHTML =
+`🏆 Puntaje Final: <strong>${score}</strong>`;
+
+let level = "";
+
+if(score <= 30){
+level = "👶 Usuario Novato";
+}
+else if(score <= 70){
+level = "🧠 Analista IA";
+}
+else{
+level = "🚀 Experto en Ética IA";
+}
+
+document.getElementById("final-level").innerHTML =
+`Nivel Obtenido: <strong>${level}</strong>`;
+
+}
+
+function restartGame(){
+
+currentQuestion = 0;
+score = 0;
+lives = 3;
+
+document.getElementById("score").innerText = 0;
+document.getElementById("lives").innerText = 3;
+
+resultScreen.classList.remove("active");
+startScreen.classList.add("active");
+
+}
+
+</script>
+
+</body>
+</html>
